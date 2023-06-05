@@ -1,0 +1,49 @@
+server:
+  port: ${PORT}
+
+  servlet:
+    context-path: /shary-auth
+spring:
+  config:
+    import:
+      optional:file:.env[.properties]
+    profiles:
+      active: ${PROFILE}
+  application:
+    name: shary-auth
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/changelog-master.xml
+
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: false
+    hibernate:
+      ddl-auto: validate
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:shary-auth}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+
+app:
+  links:
+    register: http://localhost:5554/shary-auth/users/register
+  messages:
+    errors:
+      entity:
+        update: Error while updating data (there may be errors in the name of the fields or the type of their value)
+      user:
+        by-id-not-found: User with id %s not found
+        by-email-not-found: User with email %s not found
+        by-phone-not-found: User with phone %s not found
+      role:
+        by-id-not-found: Role with id %s not found
+        by-name-not-found: Role with name %s not found
+jwt:
+  secret: ${JWT_SECRET}
+  lifetime: ${JWT_LIFETIME}

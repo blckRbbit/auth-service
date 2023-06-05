@@ -1,0 +1,57 @@
+stages:
+  - deploy
+
+Dep develop:
+  stage: deploy
+  tags:
+    - ssh
+  before_script:
+    - eval $(ssh-agent -s)
+    - eval PRIVATE_KEY=\$SSH_PRIVATE_KEY_DEVELOP && echo "${PRIVATE_KEY}" | base64 -d | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh 
+    - chmod 700 ~/.ssh 
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config 
+  script:
+    ## Check branch
+    - BRANCH=$(eval USER_HOST=\$SSH_USER_HOST_DEVELOP && ssh ${USER_HOST} "cd ~/www/gateway-develop && git branch | grep \* | cut -d ' ' -f2-")
+    - echo 'Branch on server = ' $BRANCH
+    - echo 'Commit branch  = ' $CI_COMMIT_BRANCH
+    - if [[ $CI_COMMIT_BRANCH == $BRANCH ]]; then echo 'Branch OK'; else exit 1; fi 
+    ## Check branch 
+    ## Deploy
+    - echo 'Deploy'
+    - eval USER_HOST=\$SSH_USER_HOST_DEVELOP && ssh ${USER_HOST} "cd ~/www/shary-auth-develop && git pull"
+    - eval USER_HOST=\$SSH_USER_HOST_DEVELOP && ssh ${USER_HOST} "cd ~/www/shary-auth-develop && make deploy && git status" # deploy
+    - eval USER_HOST=\$SSH_USER_HOST_DEVELOP && ssh ${USER_HOST} "cd ~/www/shary-auth-develop && git log --oneline | head -10"
+    ## Deploy
+  rules:
+      - if: '$CI_COMMIT_BRANCH == "dev"'
+        when: always
+
+Dep prod:
+  stage: deploy
+  tags:
+    - ssh
+  before_script:
+    - eval $(ssh-agent -s)
+    - eval PRIVATE_KEY=\$SSH_PRIVATE_KEY_DEVELOP && echo "${PRIVATE_KEY}" | base64 -d | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh 
+    - chmod 700 ~/.ssh 
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config 
+  script:
+    ## Check branch
+    - BRANCH=$(eval USER_HOST=\$SSH_USER_HOST_DEVELOP && ssh ${USER_HOST} "cd ~/www/shary-auth && git branch | grep \* | cut -d ' ' -f2-")
+    - echo 'Branch on server = ' $BRANCH
+    - echo 'Commit branch  = ' $CI_COMMIT_BRANCH
+    - if [[ $CI_COMMIT_BRANCH == $BRANCH ]]; then echo 'Branch OK'; else exit 1; fi 
+    ## Check branch 
+    ## Deploy
+    - echo 'Deploy'
+    - eval USER_HOST=\$SSH_USER_HOST_DEVELOP && ssh ${USER_HOST} "cd ~/www/shary-auth && git pull"
+    - eval USER_HOST=\$SSH_USER_HOST_DEVELOP && ssh ${USER_HOST} "cd ~/www/shary-auth && make deploy && git status" # deploy
+    - eval USER_HOST=\$SSH_USER_HOST_DEVELOP && ssh ${USER_HOST} "cd ~/www/shary-auth && git log --oneline | head -10"
+    ## Deploy
+  rules:
+      - if: '$CI_COMMIT_BRANCH == "main"'
+        when: always
+             

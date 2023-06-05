@@ -1,0 +1,10 @@
+ext {
+    versions = [
+            'springdoc' : '2.0.4',
+            'jaxbApi' : '2.4.0-b180830.0359',
+            'lombok' : '1.18.26',
+            'mapstruct' : '1.5.3.Final',
+            'jjwt' : '0.9.1',
+            'restdoc' : 'v0.4.4'
+    ]
+}

@@ -1,0 +1,36 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet id="2023-04-29-1-create-table-users-roles" author="blckrbbit">
+
+        <createTable tableName="users_roles">
+
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="role_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="users_roles" baseColumnNames="user_id"
+                                 constraintName="fk_users_roles_user"
+                                 referencedTableName="users" referencedColumnNames="id"/>
+<!--                                 onDelete="CASCADE"/>-->
+
+        <addForeignKeyConstraint baseTableName="users_roles" baseColumnNames="role_id"
+                                 constraintName="fk_users_roles_role"
+                                 referencedTableName="roles" referencedColumnNames="id"/>
+<!--                                 onDelete="CASCADE"/>-->
+
+        <addPrimaryKey tableName="users_roles" columnNames="user_id, role_id"
+                       constraintName="users_roles_pk"/>
+
+    </changeSet>
+
+</databaseChangeLog>
